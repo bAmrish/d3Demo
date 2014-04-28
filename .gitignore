@@ -27,3 +27,6 @@ node_modules
 #sublime-project
 *.sublime-project
 *.sublime-workspace
+
+#bower components
+bower_components
