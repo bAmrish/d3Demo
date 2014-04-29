@@ -6,14 +6,64 @@ window.addEventListener('load', function(){
 	makeChart3();
 	svgChart1();
 	svgChart2();
+	verticalBars1();
 });
+
+var verticalBars1 = function() {
+	var chartHeight = 240;
+	var chartWidth = 700;
+	var textPadding = -10;
+
+	var scale = d3.scale.linear()
+		.range([0, chartHeight + textPadding]);
+
+	var chart = d3.select('#vbar1')
+		.attr('height', chartHeight);
+
+	var type = function(d) {
+		d.value = parseFloat(d.frequency, 10) * 100;
+		return d;
+	};	
+
+	d3.tsv('alpha.tsv', type, function(error, data) {
+		console.log(data);
+		scale.domain([0, d3.max(data, function(d) {
+			return d.value;
+		})]);
+
+		var barWidth = chartWidth / data.length;
+
+		chart.attr('width', data.length * barWidth);
+
+		var bars = chart.selectAll('g')
+			.data(data)
+			.enter()
+			.append('g')
+			.attr('transform', function (d, i) {
+				return 'translate(' + (i * barWidth) + ', ' + (chartHeight - scale(d.value)) + ')';
+			});
+
+		bars.append('rect')
+			.attr('width', barWidth - 1)
+			.attr('height', function (d) {
+				return scale(d.value);
+			});
+
+		bars.append('text')
+			.attr('x', barWidth / 2)
+			.attr('y', textPadding)
+			.attr('dy', '.75em')
+			.text(function(d) {return d.letter;});
+	});
+
+};
 
 var svgChart2 = function(){
 	var chartWidth = 420;
 	var barHeight = 20;
 
 	var chart = d3.select('#svg-chart2')
-		.attr('width', chartWidth);
+		.attr('width', chartWidth + 20);
 
 	var scale = d3.scale.linear()
 		.range([0, chartWidth]);		
@@ -23,9 +73,7 @@ var svgChart2 = function(){
 		return d;
 	};
 
-	d3.tsv('data.tsv', type, function(error, data) {
-		console.log(data);
-		
+	d3.tsv('data.tsv', type, function(error, data) {		
 		scale.domain([0, d3.max(data, function(d) {
 			return d.value;
 		})]);
@@ -46,7 +94,7 @@ var svgChart2 = function(){
 			}).attr('height', barHeight - 1);
 
 		bars.append('text')
-			.attr('x', function(d) {return scale(d.value) - 3;})
+			.attr('x', function(d) {return scale(d.value) + 15;})
 			.attr('y', barHeight / 2)
 			.attr('dy', '.35em')
 			.text(function(d) {return d.value;});	
