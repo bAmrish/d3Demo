@@ -14,8 +14,11 @@ var verticalBars1 = function() {
 	var chartWidth = 700;
 	var textPadding = -10;
 
-	var scale = d3.scale.linear()
+	var scaley = d3.scale.linear()
 		.range([0, chartHeight + textPadding]);
+
+	var scalex = d3.scale.ordinal()
+		.rangeRoundBands([0, chartWidth], 0.1);
 
 	var chart = d3.select('#vbar1')
 		.attr('height', chartHeight);
@@ -27,30 +30,31 @@ var verticalBars1 = function() {
 
 	d3.tsv('alpha.tsv', type, function(error, data) {
 		console.log(data);
-		scale.domain([0, d3.max(data, function(d) {
+
+		scalex.domain(data.map(function(d) {return d.letter;}));
+
+		scaley.domain([0, d3.max(data, function(d) {
 			return d.value;
 		})]);
 
-		var barWidth = chartWidth / data.length;
-
-		chart.attr('width', data.length * barWidth);
+		chart.attr('width', chartWidth);
 
 		var bars = chart.selectAll('g')
 			.data(data)
 			.enter()
 			.append('g')
-			.attr('transform', function (d, i) {
-				return 'translate(' + (i * barWidth) + ', ' + (chartHeight - scale(d.value)) + ')';
+			.attr('transform', function (d) {
+				return 'translate(' + scalex(d.letter) + ', ' + (chartHeight - scaley(d.value)) + ')';
 			});
 
 		bars.append('rect')
-			.attr('width', barWidth - 1)
+			.attr('width', scalex.rangeBand())
 			.attr('height', function (d) {
-				return scale(d.value);
+				return scaley(d.value);
 			});
 
 		bars.append('text')
-			.attr('x', barWidth / 2)
+			.attr('x', scalex.rangeBand() / 2)
 			.attr('y', textPadding)
 			.attr('dy', '.75em')
 			.text(function(d) {return d.letter;});
