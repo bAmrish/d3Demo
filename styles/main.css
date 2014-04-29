@@ -7,11 +7,6 @@
   color: white;
 }
 
-#svg-chart {
-	width: 420px;
-	height: 120px;
-}
-
 .chart rect {
 	fill: steelblue;
 }
