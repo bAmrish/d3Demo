@@ -10,9 +10,8 @@ window.addEventListener('load', function(){
 });
 
 var verticalBars1 = function() {
-	var containerWidth = 700;
-	var containerHeight = 240;
-	var textPadding = -10;
+	var containerWidth = 900;
+	var containerHeight = 500;
 	var margin = {
 		top: 20, right: 30, bottom: 30, left: 30
 	};
@@ -21,19 +20,28 @@ var verticalBars1 = function() {
 	var chartHeight = containerHeight - margin.top - margin.bottom;
 
 	var y_scale = d3.scale.linear()
-		.range([0, chartHeight + textPadding]);
+		.range([chartHeight, 0]);
 
 	var x_scale = d3.scale.ordinal()
 		.rangeRoundBands([0, chartWidth], 0.1);
+
+	var x_axis = d3.svg.axis()
+		.scale(x_scale)
+		.orient('bottom');
+
+	var y_axis = d3.svg.axis()
+		.scale(y_scale)
+		.orient('left')
+		.ticks(10, '%');
 
 	var chart = d3.select('#vbar1')
 		.attr('width', containerWidth)
 		.attr('height', containerHeight)
 		.append('g')
-		.attr('transform', 'translate(' + margin.top + ', ' + margin.left + ')');
+		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
 	var type = function(d) {
-		d.value = parseFloat(d.frequency, 10) * 100;
+		d.value = parseFloat(d.frequency, 10);
 		return d;
 	};	
 
@@ -46,26 +54,30 @@ var verticalBars1 = function() {
 			return d.value;
 		})]);
 
+		chart.append('g')
+			.attr('transform', 'translate(' + 0 + ', ' + chartHeight + ')')
+			.attr('class', 'x axis')
+			.call(x_axis);
 
-		var bars = chart.selectAll('g')
+		chart.append('g')
+			.attr('class', 'y axis')
+			.call(y_axis);
+
+		chart.selectAll('.bars')
 			.data(data)
 			.enter()
-			.append('g')
-			.attr('transform', function (d) {
-				return 'translate(' + x_scale(d.letter) + ', ' + (chartHeight - y_scale(d.value)) + ')';
-			});
-
-		bars.append('rect')
+			.append('rect')
+			.attr('class', 'bars')
 			.attr('width', x_scale.rangeBand())
 			.attr('height', function (d) {
-				return y_scale(d.value);
-			});
-
-		bars.append('text')
-			.attr('x', x_scale.rangeBand() / 2)
-			.attr('y', textPadding)
-			.attr('dy', '.75em')
-			.text(function(d) {return d.letter;});
+				return chartHeight - y_scale(d.value);
+			})
+			.attr('y', function(d) {
+				return y_scale(d.value); 
+			})
+			.attr('x', function(d) {
+				return x_scale(d.letter); 
+			});			
 	});
 
 };
