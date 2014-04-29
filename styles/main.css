@@ -23,6 +23,11 @@
   text-anchor: middle;
 }
 
+
+.bar:hover {
+  fill:red ;
+}
+
 .axis text {
   font: 10px sans-serif;
 }

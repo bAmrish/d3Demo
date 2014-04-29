@@ -46,8 +46,7 @@ var verticalBars1 = function() {
 	};	
 
 	d3.tsv('alpha.tsv', type, function(error, data) {
-		console.log(data);
-
+		
 		x_scale.domain(data.map(function(d) {return d.letter;}));
 
 		y_scale.domain([0, d3.max(data, function(d) {
@@ -61,13 +60,20 @@ var verticalBars1 = function() {
 
 		chart.append('g')
 			.attr('class', 'y axis')
-			.call(y_axis);
+			.call(y_axis)
+			.append('text')
+			.text('Frequency')
+			.style('text-anchor', 'end')
+			.attr('transform', 'rotate(90)')
+			.attr('dy', '.71em')
+			.attr('y', -10)
+			.attr('x', 50);
 
-		chart.selectAll('.bars')
+		chart.selectAll('.bar')
 			.data(data)
 			.enter()
 			.append('rect')
-			.attr('class', 'bars')
+			.attr('class', 'bar')
 			.attr('width', x_scale.rangeBand())
 			.attr('height', function (d) {
 				return chartHeight - y_scale(d.value);
