@@ -10,18 +10,27 @@ window.addEventListener('load', function(){
 });
 
 var verticalBars1 = function() {
-	var chartHeight = 240;
-	var chartWidth = 700;
+	var containerWidth = 700;
+	var containerHeight = 240;
 	var textPadding = -10;
+	var margin = {
+		top: 20, right: 30, bottom: 30, left: 30
+	};
 
-	var scaley = d3.scale.linear()
+	var chartWidth = containerWidth - margin.left - margin.right;
+	var chartHeight = containerHeight - margin.top - margin.bottom;
+
+	var y_scale = d3.scale.linear()
 		.range([0, chartHeight + textPadding]);
 
-	var scalex = d3.scale.ordinal()
+	var x_scale = d3.scale.ordinal()
 		.rangeRoundBands([0, chartWidth], 0.1);
 
 	var chart = d3.select('#vbar1')
-		.attr('height', chartHeight);
+		.attr('width', containerWidth)
+		.attr('height', containerHeight)
+		.append('g')
+		.attr('transform', 'translate(' + margin.top + ', ' + margin.left + ')');
 
 	var type = function(d) {
 		d.value = parseFloat(d.frequency, 10) * 100;
@@ -31,30 +40,29 @@ var verticalBars1 = function() {
 	d3.tsv('alpha.tsv', type, function(error, data) {
 		console.log(data);
 
-		scalex.domain(data.map(function(d) {return d.letter;}));
+		x_scale.domain(data.map(function(d) {return d.letter;}));
 
-		scaley.domain([0, d3.max(data, function(d) {
+		y_scale.domain([0, d3.max(data, function(d) {
 			return d.value;
 		})]);
 
-		chart.attr('width', chartWidth);
 
 		var bars = chart.selectAll('g')
 			.data(data)
 			.enter()
 			.append('g')
 			.attr('transform', function (d) {
-				return 'translate(' + scalex(d.letter) + ', ' + (chartHeight - scaley(d.value)) + ')';
+				return 'translate(' + x_scale(d.letter) + ', ' + (chartHeight - y_scale(d.value)) + ')';
 			});
 
 		bars.append('rect')
-			.attr('width', scalex.rangeBand())
+			.attr('width', x_scale.rangeBand())
 			.attr('height', function (d) {
-				return scaley(d.value);
+				return y_scale(d.value);
 			});
 
 		bars.append('text')
-			.attr('x', scalex.rangeBand() / 2)
+			.attr('x', x_scale.rangeBand() / 2)
 			.attr('y', textPadding)
 			.attr('dy', '.75em')
 			.text(function(d) {return d.letter;});
