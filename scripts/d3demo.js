@@ -69,21 +69,23 @@ var verticalBars1 = function() {
 			.attr('y', -10)
 			.attr('x', 50);
 
-		chart.selectAll('.bar')
+		var bars = chart.selectAll('.bar')
 			.data(data)
 			.enter()
 			.append('rect')
 			.attr('class', 'bar')
 			.attr('width', x_scale.rangeBand())
-			.attr('height', function (d) {
-				return chartHeight - y_scale(d.value);
-			})
-			.attr('y', function(d) {
-				return y_scale(d.value); 
-			})
+			.attr('height', 1)
+			.attr('y',chartHeight)
 			.attr('x', function(d) {
 				return x_scale(d.letter); 
-			});			
+			});
+
+			bars.transition()
+				.duration(800)
+				.attr('y', function(d){return y_scale(d.value); })
+				.attr('height', function(d){return chartHeight - y_scale(d.value); });
+
 	});
 
 };
