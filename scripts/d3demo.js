@@ -6,10 +6,10 @@ window.addEventListener('load', function(){
 });
 
 var verticalBars1 = function() {
-	var containerWidth = 900;
+	var containerWidth = 1024;
 	var containerHeight = 500;
 	var margin = {
-		top: 20, right: 30, bottom: 120, left: 50
+		top: 30, right: 30, bottom: 120, left: 30
 	};
 
 	var chartWidth = containerWidth - margin.left - margin.right;
@@ -28,7 +28,7 @@ var verticalBars1 = function() {
 	var y_axis = d3.svg.axis()
 		.scale(y_scale)
 		.orient('left')
-		.ticks(10, '0.2s');
+		.ticks(10, '0.0s');
 
 	var chart = d3.select('#vbar1')
 		.attr('width', containerWidth)
@@ -63,44 +63,76 @@ var verticalBars1 = function() {
 			.selectAll('.tick text')
 				.call(function(texts){
 					texts.each(function() {
-						var text = d3.select(this);
-						text.attr('style', 'text-anchor:start');
-						text.attr('transform', 'rotate(90)');
-						text.attr('dy', 0);
-						text.attr('y', x_scale.rangeBand() * 1 / 4);
-						text.attr('dx', '0.7em');
+						var text = d3.select(this)
+							.attr('style', 'text-anchor:start')
+							.attr('transform', 'rotate(90)')
+							.attr('dy', 0)
+							.attr('y', x_scale.rangeBand() * 1 / 4)
+							.attr('dx', '0.7em');
 					});
 				});
 
 		chart.append('g')
 			.attr('class', 'y axis')
-			.call(y_axis)
+				.call(y_axis)
 			.append('text')
-			.text('Frequency')
-			.style('text-anchor', 'end')
-			.attr('transform', 'rotate(90)')
-			.attr('dy', '.71em')
-			.attr('y', -10)
-			.attr('x', 50);
+				.text('Population')
+				.style('text-anchor', 'end')
+				.attr('transform', 'rotate(90)')
+				.attr('dy', '.71em')
+				.attr('y', -10)
+				.attr('x', 50);
 
-		var bars = chart.selectAll('.bar')
-			.data(data)
-			.enter()
+		var bars = chart.selectAll('g.bar')
+				.data(data)
+				.enter()
+			.append('g')
+				.attr('class', 'bar')
+				.attr('transform', function(d){
+					return 'translate(' + x_scale(d.name) + ',' + 0 + ')';	
+				})
 			.append('rect')
-			.attr('class', 'bar')
-			.attr('width', x_scale.rangeBand())
-			.attr('height', 1)
-			.attr('y',chartHeight)
-			.attr('x', function(d) {
-				return x_scale(d.name); 
-			}).sort(function(a, b){
-				return a.value - b.value;	
-			});
+				.attr('width', x_scale.rangeBand())
+				.attr('height', 1)
+				.attr('y',chartHeight);
 
-			bars.transition()
-				.duration(800)
-				.attr('y', function(d){return y_scale(d.value); })
-				.attr('height', function(d){return chartHeight - y_scale(d.value); });
+		bars.on('mouseover', function(d, i){
+			var tooltip_bottom_padding = 10;
+			d3.select(this.parentNode)
+				.append('g')
+					.attr('class', 'bar-tooltip')
+				.append('text')
+					.text(d.name + ' = ' + d3.format('.3s')(d.value))
+					.attr('x', 0)
+					.attr('y', y_scale(d.value) - tooltip_bottom_padding);
+
+			var textWidth = $(d3.select('.bar-tooltip').select('text').node()).width();	
+			var textHeight = $(d3.select('.bar-tooltip').select('text').node()).height();	
+
+			d3.select('.bar-tooltip')
+				.insert('rect', ':first-child')
+					.attr('width', textWidth + 10)
+					.attr('height', textHeight + 5)
+ 					.attr('x', (textWidth/-2) - 5)
+					.attr('y', y_scale(d.value) - tooltip_bottom_padding - textHeight)
+					.attr('rx', 5)
+					.attr('ry', 5)
+					;
+			
+			if(i === 0){
+				d3.select('.bar-tooltip text').attr('class', 'first');
+				d3.select('.bar-tooltip rect').attr('x', 0);
+			}		
+		});	
+
+		bars.on('mouseout', function(){
+			d3.select(this.parentNode).select('.bar-tooltip').remove();
+		});
+
+		bars.transition()
+			.duration(800)
+			.attr('y', function(d){return y_scale(d.value); })
+			.attr('height', function(d){return chartHeight - y_scale(d.value); });
 
 	});
 };

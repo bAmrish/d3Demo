@@ -38,3 +38,19 @@
   stroke: #000;
   shape-rendering: crispEdges;
 }
+
+.bar .bar-tooltip text{
+  font-size: 15px;
+  font-weight: bold;
+  border: 1px solid black;
+  text-anchor: middle;
+}
+
+.bar .bar-tooltip text.first{
+  text-anchor: start;
+}
+
+.bar .bar-tooltip rect{
+  fill: #A3DA72;
+  stroke: black;
+}
