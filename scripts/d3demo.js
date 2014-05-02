@@ -2,10 +2,10 @@
 'use strict';
 
 window.addEventListener('load', function(){
-	verticalBars1();
+	chart();
 });
 
-var verticalBars1 = function() {
+var chart = function() {
 	var containerWidth = 1024;
 	var containerHeight = 500;
 	var margin = {

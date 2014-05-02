@@ -4,7 +4,7 @@
   // Documentation: http://www.jshint.com/docs/
   "browser": true,
   "esnext": true,
-  "globals": ["d3", "console", "$"],
+  "globals": ["d3", "console", "$", "grunt", "module"],
   "globalstrict": true,
   "quotmark": "single",
   "smarttabs": true,

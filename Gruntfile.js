@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(grunt) {
 
   	// Project configuration.
@@ -6,8 +8,7 @@ module.exports = function(grunt) {
 		connect: {
 			server: {
 				option: {
-					port: 8000,
-					keepalive: true  
+					port: 8000
 				}
 			}
 		}
@@ -15,7 +16,12 @@ module.exports = function(grunt) {
 
   	grunt.loadNpmTasks('grunt-contrib-connect');
 
-	// Default task(s).
-	grunt.registerTask('default', ['connect:server:keepalive']);
+  	//define grunt serve command to start a local server for dev testing.
+	grunt.registerTask('serve', ['connect:server:keepalive']);
+
+	//default task.
+	grunt.registerTask('default', function () {
+		console.log('Use "grunt serve" command to start local server on port 8000. ');
+	});
 
 };
