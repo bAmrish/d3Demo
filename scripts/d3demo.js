@@ -7,7 +7,10 @@ window.addEventListener('load', function () {
         margin: {
             top: 30, right: 30, bottom: 120, left: 30
         },
-        tooltip: true
+        tooltip: {
+            show: true
+        }
+
     };
 
     var b = new BarChart('#vbar1', config);
@@ -33,7 +36,29 @@ window.addEventListener('load', function () {
 });
 
 function BarChart(node, config) {
-    this.config = config;
+    var defaultConfig = {
+        width: 500,
+        height: 500,
+        margin: {
+            top: 30, right: 30, bottom: 120, left: 30
+        },
+        tooltip: {
+            show: true,
+            padding: {
+                top: 5,
+                right: 5,
+                bottom: 5,
+                left: 5
+            },
+
+            margin: {
+                bottom: 10
+            }
+        }
+    };
+
+    this.config = $.extend(true, {}, defaultConfig, config);
+
     this.node = d3.select(node);
     this.init();
 }
@@ -153,7 +178,7 @@ BarChart.prototype = {
                 return barChart.chartHeight - barChart.y_scale(d.value);
             });
 
-        if (this.config.tooltip) {
+        if (this.config.tooltip.show) {
             this.createToolTip();
         }
 
@@ -163,17 +188,8 @@ BarChart.prototype = {
     createToolTip: function () {
 
         var barChart = this;
-
-        var padding = {
-            top: 5,
-            right: 5,
-            bottom: 5,
-            left: 5
-        };
-
-        var margin = {
-            bottom: 10
-        };
+        var margin = this.config.tooltip.margin;
+        var padding = this.config.tooltip.padding;
 
         /*For some reason I need to add this correction to center the text in the rectangle.*/
         var correction = 2;
