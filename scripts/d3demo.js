@@ -81,6 +81,8 @@ BarChart.prototype = {
 
     createChart: function () {
         this.chart = this.node
+            .append('svg')
+            .attr('class', 'chart vchart')
             .attr('width', this.containerWidth)
             .attr('height', this.containerHeight)
             .append('g')
