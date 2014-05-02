@@ -4,11 +4,14 @@ window.addEventListener('load', function () {
     var config = {
         width: 1024,
         height: 500,
-        margin : {
+        margin: {
             top: 30, right: 30, bottom: 120, left: 30
-        }
+        },
+        tooltip: true
     };
+
     var b = new BarChart('#vbar1', config);
+
     var type = function (d) {
         d.value = parseFloat(d.CENSUS2010POP, 10);
         d.name = d.NAME;
@@ -26,7 +29,7 @@ window.addEventListener('load', function () {
         b.update(data);
 
     });
-    //chart(config);
+
 });
 
 function BarChart(node, config) {
@@ -36,7 +39,6 @@ function BarChart(node, config) {
 }
 
 BarChart.prototype = {
-
     init: function () {
 
         this.containerWidth = this.config.width || 1024;
@@ -54,7 +56,7 @@ BarChart.prototype = {
         return this;
     },
 
-    createScales: function() {
+    createScales: function () {
         this.y_scale = d3.scale.linear()
             .range([this.chartHeight, 0]);
 
@@ -64,7 +66,7 @@ BarChart.prototype = {
         return this;
     },
 
-    createAxis: function() {
+    createAxis: function () {
         this.x_axis = d3.svg.axis()
             .scale(this.x_scale)
             .orient('bottom');
@@ -77,7 +79,7 @@ BarChart.prototype = {
         return this;
     },
 
-    createChart: function() {
+    createChart: function () {
         this.chart = this.node
             .attr('width', this.containerWidth)
             .attr('height', this.containerHeight)
@@ -87,7 +89,7 @@ BarChart.prototype = {
         return this;
     },
 
-    update: function(data){
+    update: function (data) {
         var barChart = this;
 
         this.data = data;
@@ -149,34 +151,49 @@ BarChart.prototype = {
                 return barChart.chartHeight - barChart.y_scale(d.value);
             });
 
-        this.createToolTip();
+        if (this.config.tooltip) {
+            this.createToolTip();
+        }
 
         return this;
     },
 
-    createToolTip: function() {
+    createToolTip: function () {
 
         var barChart = this;
 
+        var padding = {
+            top: 5,
+            right: 5,
+            bottom: 5,
+            left: 5
+        };
+
+        var margin = {
+            bottom: 10
+        };
+
+        /*For some reason I need to add this correction to center the text in the rectangle.*/
+        var correction = 2;
+
         this.bars.on('mouseover', function (d, i) {
-            var tooltip_bottom_padding = 10;
             d3.select(this.parentNode)
                 .append('g')
                 .attr('class', 'bar-tooltip')
                 .append('text')
                 .text(d.name + ' = ' + d3.format('.3s')(d.value))
                 .attr('x', 0)
-                .attr('y', barChart.y_scale(d.value) - tooltip_bottom_padding);
+                .attr('y', barChart.y_scale(d.value) - (margin.bottom + padding.bottom));
 
             var textWidth = $(d3.select('.bar-tooltip').select('text').node()).width();
             var textHeight = $(d3.select('.bar-tooltip').select('text').node()).height();
 
             d3.select('.bar-tooltip')
                 .insert('rect', ':first-child')
-                .attr('width', textWidth + 10)
-                .attr('height', textHeight + 5)
-                .attr('x', (textWidth / -2) - 5)
-                .attr('y', barChart.y_scale(d.value) - tooltip_bottom_padding - textHeight)
+                .attr('width', textWidth + padding.left + padding.right)
+                .attr('height', textHeight + padding.top + padding.bottom)
+                .attr('x', ((textWidth + padding.left + padding.right) / -2))
+                .attr('y', barChart.y_scale(d.value) - (textHeight + margin.bottom + padding.bottom + padding.top) + correction)
                 .attr('rx', 5)
                 .attr('ry', 5);
 
@@ -192,7 +209,3 @@ BarChart.prototype = {
     }
 };
 
-var chart = function (config) {
-
-
-};
