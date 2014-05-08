@@ -31,8 +31,26 @@ window.addEventListener('load', function () {
 
         b.update(data);
 
+        $('#sort_order').on('change', function(){
+            var val = $(this).val();
+            if(val === 'value'){
+                data = data.filter(function (d) {
+                    return( d.STATE !== '0');
+                }).sort(function (a, b) {
+                    return b.value - a.value;
+                });
+            } else {
+                data = data.filter(function (d) {
+                    return( d.STATE !== '0');
+                }).sort(function (a, b) {
+                    if(a.name > b.name) return 1;
+                    if(a.name < b.name) return -1;
+                    return 0;
+                });
+            }
+            b.sort(data);
+        });
     });
-
 });
 
 function BarChart(node, config) {
@@ -159,6 +177,7 @@ BarChart.prototype = {
         this.bars = this.chart.selectAll('g.bar')
             .data(this.data)
             .enter()
+            .sort()
             .append('g')
             .attr('class', 'bar')
             .attr('transform', function (d) {
@@ -224,6 +243,45 @@ BarChart.prototype = {
         this.bars.on('mouseout', function () {
             d3.select(this.parentNode).select('.bar-tooltip').remove();
         });
+    },
+
+    sort: function (sortData) {
+        var barChart = this;
+        var data = this.data = sortData;
+        var transitionDuration = 100;
+
+        this.x_scale.domain(data.map(function (d) {
+            return d.name;
+        }));
+
+        this.chart.select('.x.axis').remove();
+
+        this.chart.append('g')
+            .attr('transform', 'translate(' + 0 + ', ' + this.chartHeight + ')')
+            .attr('class', 'x axis')
+            .call(this.x_axis)
+            .selectAll('.tick text')
+            .call(function (texts) {
+                texts.each(function () {
+                    var text = d3.select(this)
+                        .attr('style', 'text-anchor:start')
+                        .attr('transform', 'rotate(90)')
+                        .attr('dy', 0)
+                        .attr('y', barChart.x_scale.rangeBand() * 1 / 4)
+                        .attr('dx', '0.7em');
+                });
+            });
+
+        this.chart.selectAll('g.bar')
+            .transition()
+            .duration(transitionDuration)
+            .delay(function(d, i){
+                return i * transitionDuration;
+            })
+            .attr('transform', function(d){
+                return 'translate(' + barChart.x_scale(d.name) + ', 0)';
+            })
+            .style('fill', 'red');
     }
 };
 
