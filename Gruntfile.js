@@ -2,10 +2,8 @@
 
 module.exports = function(grunt) {
 
-  	grunt.loadNpmTasks('grunt-contrib-connect');
-
   	//capture --port option if passed in or elease default to 8000
-	var gruntServPort = grunt.option('port') || 8000;
+	var gruntServePort = grunt.option('port') || 8000;
 
   	// Project configuration.
   	grunt.initConfig({
@@ -13,19 +11,29 @@ module.exports = function(grunt) {
 		connect: {
 			server: {
 				options: {
-					port: gruntServPort,
+					port: gruntServePort,
 					keepalive: true
 				}
 			}
-		}
+		},
+
+        open: {
+            server: {
+                path: 'http://localhost:' + gruntServePort + '/'
+            }
+        }
 	});
 
-  	//define grunt serve command to start a local server for dev testing.
-	grunt.registerTask('serve', ['connect:server']);
+    //Load required grunt task
+    grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-open');
+
+    //define grunt serve command to start a local server for server testing.
+	grunt.registerTask('serve', ['open:server', 'connect:server']);
 
 	//default task.
 	grunt.registerTask('default', function () {
-		console.log('Use "grunt serve" command to start local server on port ' + gruntServPort + '. ');
+		console.log('Use "grunt serve" command to start local server on port ' + gruntServePort + '. ');
 	});
 
 };
