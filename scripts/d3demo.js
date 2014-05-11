@@ -46,6 +46,24 @@ window.addEventListener('load', function () {
             }
             //b.sort(data, val);
         });
+
+        $('#show_line_graph').on('change', function(){
+            if($(this).prop('checked')){
+                $('.bar-path').attr('class', 'bar-path');
+                $('.bar circle').attr('class', '');
+            } else {
+                $('.bar-path').attr('class', 'bar-path hidden');
+                $('.bar circle').attr('class', 'hidden');
+            }
+        });
+
+        $('#show_bar_graph').on('change', function(){
+            if($(this).prop('checked')){
+                $('.bar rect').attr('class', '');
+            } else {
+                $('.bar rect').attr('class', 'hidden');
+            }
+        })
     });
 });
 
@@ -299,7 +317,6 @@ BarChart.prototype = {
 
         this.chart.selectAll('g.bar')
             .sort(sortFunction)
-//            .order()
             .transition()
             .duration(transitionDuration)
             .delay(function(d, i){
